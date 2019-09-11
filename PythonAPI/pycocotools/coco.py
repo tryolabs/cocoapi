@@ -68,22 +68,18 @@ def _isArrayLike(obj):
 
 
 class COCO:
-    def __init__(self, annotation_file=None):
+    def __init__(self, annotations=None):
         """
         Constructor of Microsoft COCO helper class for reading and visualizing annotations.
-        :param annotation_file (str): location of annotation file
-        :param image_folder (str): location to the folder that hosts images.
-        :return:
+        :param annotations (str): path to annotation json file or dict containing annotations
         """
-        # load dataset
-        self.dataset,self.anns,self.cats,self.imgs = dict(),dict(),dict(),dict()
+        self.dataset, self.anns, self.cats, self.imgs = dict(), dict(), dict(), dict()
         self.imgToAnns, self.catToImgs = defaultdict(list), defaultdict(list)
-        if not annotation_file == None:
-            print('loading annotations into memory...')
-            tic = time.time()
-            dataset = json.load(open(annotation_file, 'r'))
-            assert type(dataset)==dict, 'annotation file format {} not supported'.format(type(dataset))
-            print('Done (t={:0.2f}s)'.format(time.time()- tic))
+        if annotations is not None:
+            if type(annotations) == str:
+                dataset = json.load(open(annotations, 'r'))
+            else:
+                dataset = annotations
             self.dataset = dataset
             self.createIndex()
 
@@ -91,7 +87,7 @@ class COCO:
         # create index
         print('creating index...')
         anns, cats, imgs = {}, {}, {}
-        imgToAnns,catToImgs = defaultdict(list),defaultdict(list)
+        imgToAnns, catToImgs = defaultdict(list), defaultdict(list)
         if 'annotations' in self.dataset:
             for ann in self.dataset['annotations']:
                 imgToAnns[ann['image_id']].append(ann)
